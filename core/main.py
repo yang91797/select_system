@@ -178,13 +178,14 @@ class Teacher(Create):  # 老师类
         flag = False
         if not name:
             t_name = input('请输入讲师名：').strip()
-        else:
-            flag = True
+
         info = common.information(settings.teacher_path, 'rb')
         for dic in info:
             if dic['姓名'] == t_name:
                 flag = True
-
+                break
+        else:
+            yield info
         if flag:
             class_info = Student_class.tell_info(t_name)
             yield class_info
@@ -318,14 +319,11 @@ class Student(Create):  # 学生类
             pass
 
 
-
-
 class Root(object, metaclass=RootMetaclass):  # 管理员
     def get_func(self, callback):
         eval("self.{}()".format(callback))
 
     def add_teacher(self):  # 创建讲师
-        print("增加老师")
         Teacher.add()
 
     def add_course(self):  # 添加课程
@@ -352,11 +350,12 @@ class Root(object, metaclass=RootMetaclass):  # 管理员
         查看老师
         :return:
         """
-        print("查看老师")
+
         teach_info = Teacher().tell_info(name='All')
         for item in teach_info:
             for i in item:
-                print(i)
+                print("所在校区：%s  姓名：%s  性别：%s  年龄：%s 所教课程：%s" % (i.get("所在校区"), i.get("姓名"),
+                                                                i.get("性别"), i.get("年龄"), i.get("所教课程名")))
 
     def view_course(self):
         """
@@ -370,14 +369,15 @@ class Root(object, metaclass=RootMetaclass):  # 管理员
         查看班级
         :return:
         """
-        Course.tell_info()
+        info = Student_class.tell_info()
+        for item in info:
+            print(item)
 
     def view_school(self):
         """
         查看校区
         :return:
         """
-        print("查看校区")
         School.tell_info()  # 显示校区
 
 
